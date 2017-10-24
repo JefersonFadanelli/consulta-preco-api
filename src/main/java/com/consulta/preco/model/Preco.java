@@ -26,7 +26,7 @@ public class Preco {
 	private Double preco;
 	
 	@NotNull
-	private int idEstabelecimento;
+	private Long idEstabelecimento;
 	
 	public Long getId() {
 		return id;
@@ -52,11 +52,11 @@ public class Preco {
 		this.preco = preco;
 	}
 
-	public int getIdEstabelecimento() {
+	public Long getIdEstabelecimento() {
 		return idEstabelecimento;
 	}
 
-	public void setIdEstabelecimento(int idEstabelecimento) {
+	public void setIdEstabelecimento(Long idEstabelecimento) {
 		this.idEstabelecimento = idEstabelecimento;
 	}
 	

@@ -6,4 +6,5 @@ import com.consulta.preco.model.Estabelecimento;
 
 public interface EstabelecimentoRepository extends JpaRepository<Estabelecimento, Long> {
 
+	public Estabelecimento getById(Long id);
 }

@@ -1,5 +1,6 @@
 package com.consulta.preco.resource;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -13,7 +14,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.consulta.preco.model.Preco;
+import com.consulta.preco.model.Produto;
+import com.consulta.preco.model.ConsultaPreco;
+import com.consulta.preco.model.Estabelecimento;
 import com.consulta.preco.repository.PrecoRepository;
+import com.consulta.preco.repository.EstabelecimentoRepository;
+import com.consulta.preco.repository.ProdutoRepository;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -21,6 +27,12 @@ public class PrecoResource {
 	
 	@Autowired
 	private PrecoRepository precoRepository;
+	
+	@Autowired
+	private ProdutoRepository produtoRepository;
+	
+	@Autowired
+	private EstabelecimentoRepository estabelecimentoRepository;
 	
 	@GetMapping("/precos")
 	public List<Preco> listar(){
@@ -33,8 +45,34 @@ public class PrecoResource {
 	}
 	
 	@GetMapping("/preco/id/{codigoBarras}")
-	public List<Preco> buscar(@PathVariable String codigoBarras){
-		return precoRepository.findByCodigoBarras( codigoBarras );
+	public List<ConsultaPreco> buscar(@PathVariable String codigoBarras){
+		
+		List<Preco> precos = precoRepository.findByCodigoBarras( codigoBarras );
+		ConsultaPreco consultaPreco;
+		List<ConsultaPreco> listaPrecos = new ArrayList<ConsultaPreco>();
+		
+		Produto produto;
+		Estabelecimento estabelecimento;
+
+		for( Preco p : precos) {
+			consultaPreco = new ConsultaPreco();
+
+			consultaPreco.setCodigoBarras( p.getCodigoBarras() );
+			consultaPreco.setPreco( p.getPreco() );
+			
+			produto = produtoRepository.getByCodigoBarras(p.getCodigoBarras() );
+			
+			consultaPreco.setDescricaoProduto( produto.getDescricao() );
+			consultaPreco.setEmbalagem( produto.getEmbalagem() );
+			
+			estabelecimento = estabelecimentoRepository.getById( p.getIdEstabelecimento() );
+			
+			consultaPreco.setDescricaoEstabelecimento( estabelecimento.getFantasia() );
+
+			listaPrecos.add( consultaPreco );
+		}
+		
+		return listaPrecos;
 	}
 
 }
