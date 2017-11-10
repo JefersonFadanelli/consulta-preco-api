@@ -45,27 +45,66 @@ public class PrecoResource {
 	}
 	
 	@GetMapping("/preco/id/{codigoBarras}")
-	public List<ConsultaPreco> buscar(@PathVariable String codigoBarras){
+	public List<ConsultaPreco> buscarCodigoBarras(@PathVariable String codigoBarras){
 		
-		List<Preco> precos = precoRepository.findByCodigoBarras( codigoBarras );
+		Preco preco = precoRepository.findByCodigoBarras( codigoBarras );
+		
+		if(preco == null) {
+			return null;
+		}
+		
 		ConsultaPreco consultaPreco;
 		List<ConsultaPreco> listaPrecos = new ArrayList<ConsultaPreco>();
 		
 		Produto produto;
 		Estabelecimento estabelecimento;
 
-		for( Preco p : precos) {
+		
+		consultaPreco = new ConsultaPreco();
+
+		consultaPreco.setCodigoBarras( preco.getCodigoBarras() );
+		consultaPreco.setPreco( preco.getPreco() );
+		
+		produto = produtoRepository.findByCodigoBarras( preco.getCodigoBarras() );
+
+		consultaPreco.setDescricaoProduto( produto.getDescricao() );
+		consultaPreco.setEmbalagem( produto.getEmbalagem() );
+		
+		estabelecimento = estabelecimentoRepository.getById( preco.getIdEstabelecimento() );
+		
+		consultaPreco.setDescricaoEstabelecimento( estabelecimento.getFantasia() );
+
+		listaPrecos.add( consultaPreco );
+		
+		return listaPrecos;
+	}
+	
+	@GetMapping("/preco/descricao/{descricao}")
+	public List<ConsultaPreco> buscarDescricao(@PathVariable String descricao){
+		
+		List<Produto> produtos = produtoRepository.findByDescricao( descricao );
+		
+		if(produtos == null) {
+			return null;
+		}
+
+		ConsultaPreco consultaPreco;
+		List<ConsultaPreco> listaPrecos = new ArrayList<ConsultaPreco>();
+		
+		Preco preco;
+		Estabelecimento estabelecimento;
+
+		for( Produto p : produtos) {
 			consultaPreco = new ConsultaPreco();
 
 			consultaPreco.setCodigoBarras( p.getCodigoBarras() );
-			consultaPreco.setPreco( p.getPreco() );
+			consultaPreco.setDescricaoProduto( p.getDescricao() );
+			consultaPreco.setEmbalagem( p.getEmbalagem() );
 			
-			produto = produtoRepository.getByCodigoBarras(p.getCodigoBarras() );
+			preco = precoRepository.findByCodigoBarras( p.getCodigoBarras() );
+			consultaPreco.setPreco( preco.getPreco() );
 			
-			consultaPreco.setDescricaoProduto( produto.getDescricao() );
-			consultaPreco.setEmbalagem( produto.getEmbalagem() );
-			
-			estabelecimento = estabelecimentoRepository.getById( p.getIdEstabelecimento() );
+			estabelecimento = estabelecimentoRepository.getById( preco.getIdEstabelecimento() );
 			
 			consultaPreco.setDescricaoEstabelecimento( estabelecimento.getFantasia() );
 
